@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	private static float[][] RATES = { { 2, 0.1f }, { 4, 0.2f }, { 10, 0.5f },
 			{ 20, 1 }, { 100, 5 } };
-	private static int VERSION = 3;
+	private static int VERSION = 7;
 	private static final String DB_NAME = "rates_db";
 	static final String TABLE_NAME = "rates_name";
 
@@ -27,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String sql = "CREATE TABLE " + TABLE_NAME + " (" + BaseColumns._ID
 				+ " INTEGER PRIMARY KEY AUTOINCREMENT," + DBColumns.RATE
-				+ " REAL, " + DBColumns.BUY_CELL + " INTEGER);";
+				+ " TEXT, " + DBColumns.BUY_CELL + " INTEGER);";
 		db.execSQL(sql);
 		fillDatabase(db);
 	}
@@ -41,7 +41,7 @@ public class DBHelper extends SQLiteOpenHelper {
 					bd = new BigDecimal(0);
 				} else
 					bd = new BigDecimal(RATES[i - 1][0]);
-				double delta = RATES[i][1];
+				BigDecimal delta = new BigDecimal(RATES[i][1]);
 				Random r = new Random();
 				while (bd.compareTo(border) < 1) {
 					int c = r.nextInt(100);
@@ -51,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
 						cv.put(DBColumns.BUY_CELL, r.nextInt(2));
 						db.insert(TABLE_NAME, null, cv);
 					}
-					bd = bd.add(new BigDecimal(delta));
+					bd = bd.add((delta));
 				}
 			}
 		}
@@ -63,6 +63,7 @@ public class DBHelper extends SQLiteOpenHelper {
 			return;
 		}
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+		fillDatabase(db);
 	}
 
 	static interface DBColumns {
