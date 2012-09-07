@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World!</string>
     <string name="app_name">ADB1</string>
+    <string name="opening_db">Opening DB</string>
 
 </resources>
