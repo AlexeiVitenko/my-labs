@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.BaseColumns;
+import android.util.Log;
 import android.widget.CursorTreeAdapter;
 
 public class CursorQueryHandler extends Handler {
@@ -23,10 +24,11 @@ public class CursorQueryHandler extends Handler {
 	
 	public Cursor getBaseCursor(){
 		return mDatabase.query(DBHelper.TABLE_NAME, new String[] {DBColumns.RATE, BaseColumns._ID },
-				null, null, DBColumns.RATE, null, null, null);
+				null, null,"CAST("+ DBColumns.RATE+" AS REAL)" , null, null, null);
 	}
 	
-	public Cursor getChildGroup(RateAdapter adapter, int position, float value){
+	public Cursor getChildGroup(RateAdapter adapter, int position, String value){
+		Log.d("value", value);
 		return 	mDatabase.query(DBHelper.TABLE_NAME, new String[] { BaseColumns._ID, DBColumns.BUY_CELL, DBColumns.RATE },
 				DBColumns.RATE +" = "+ value, null, null, null, null);
 	}
