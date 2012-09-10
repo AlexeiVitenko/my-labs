@@ -42,7 +42,7 @@ public class RateAdapter extends CursorTreeAdapter {
 	
 	@Override
 	protected Cursor getChildrenCursor(Cursor groupCursor) {
-		return mQueryHandler.getChildGroup(this, groupCursor.getPosition(), groupCursor.getFloat(groupCursor.getColumnIndex(DBColumns.RATE)));
+		return mQueryHandler.getChildGroup(this, groupCursor.getPosition(), groupCursor.getString(groupCursor.getColumnIndex(DBColumns.RATE)));
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class RateAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
-		((TextView)view).setText("" + cursor.getDouble(cursor.getColumnIndex(DBColumns.RATE)));
+		((TextView)view).setText("" + cursor.getString(cursor.getColumnIndex(DBColumns.RATE)));
 	}
 
 	@Override
@@ -72,7 +72,6 @@ public class RateAdapter extends CursorTreeAdapter {
 		Log.d("cursor", "!" + cursor.getCount());
 	//	long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		boolean buy = cursor.getLong(cursor.getColumnIndex(DBHelper.DBColumns.BUY_CELL)) == 1 ? true : false;
-		double rate = cursor.getDouble(cursor.getColumnIndex(DBHelper.DBColumns.RATE));
-		tv.setText("RATE: " + rate + ", BUY: " + buy);
+		tv.setText("RATE: " + cursor.getString(cursor.getColumnIndex(DBHelper.DBColumns.RATE)) + ", BUY: " + buy);
 	}
 }
