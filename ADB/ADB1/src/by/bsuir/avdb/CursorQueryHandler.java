@@ -29,8 +29,8 @@ public class CursorQueryHandler extends Handler {
 	
 	public Cursor getChildGroup(RateAdapter adapter, int position, String value){
 		Log.d("value", value);
-		return 	mDatabase.query(DBHelper.TABLE_NAME, new String[] { BaseColumns._ID, DBColumns.BUY_CELL, DBColumns.RATE },
-				DBColumns.RATE +" = "+ value, null, null, null, null);
+		return 	mDatabase.query(DBHelper.TABLE_NAME, new String[] { BaseColumns._ID, DBColumns.BUY_CELL, DBColumns.RATE, "count(*)" },
+				DBColumns.RATE +" = "+ value, null, DBColumns.BUY_CELL, null, null);
 	}
 	
 	private void updateChildGroup(final Cursor cursor, final CursorTreeAdapter adapter, final int groupPosition){
