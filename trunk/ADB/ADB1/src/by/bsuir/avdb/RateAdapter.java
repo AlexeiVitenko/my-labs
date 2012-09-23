@@ -84,12 +84,12 @@ public class RateAdapter extends CursorTreeAdapter {
     @Override
     protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
         TextView tv = (TextView) view;
-        Log.d("cursor", "!" + cursor.getCount());
         for (String string : cursor.getColumnNames()) {
-            Log.d("Names","" + string);
-        }        
+            Log.d("Names", "" + string);
+        }
         boolean buy = cursor.getLong(cursor.getColumnIndex(DBHelper.DBColumns.BUY_SELL)) == 1 ? true : false;
-        tv.setText("RATE: " + cursor.getString(cursor.getColumnIndex(DBHelper.DBColumns.RATE)) + ", BUY: " + buy
+        tv.setText("RATE: " + cursor.getString(cursor.getColumnIndex(DBHelper.DBColumns.RATE)) + ", "
+                + (buy ? view.getContext().getString(R.string.buy) : view.getContext().getString(R.string.sell))
                 + ", count: " + cursor.getInt(cursor.getColumnIndex(DBColumns.COUNT)));
     }
 }
