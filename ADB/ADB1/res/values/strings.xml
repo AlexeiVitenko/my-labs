@@ -17,4 +17,6 @@
     <string name="count">Count</string>
     <string name="rate">Rate</string>
     <string name="statistics">Statistics</string>
+    <string name="buy">Buy</string>
+    <string name="sell">Sell</string>
 </resources>
