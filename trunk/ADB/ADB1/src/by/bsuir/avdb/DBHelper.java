@@ -15,7 +15,7 @@ import android.util.Log;
 public class DBHelper extends SQLiteOpenHelper {
 
 	private static float[][] RATES = { { 2f, 0.1f }, { 4f, 0.2f }, { 10f, 0.5f }, { 20f, 1f }, { 100f, 5f } };
-	private static int VERSION = 18;
+	private static int VERSION = 19;
 	private static final String DB_NAME = "rates_db";
 	static final String TABLE_NAME = "rates_name";
 
@@ -31,7 +31,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	private void createTables(SQLiteDatabase db) {
 		Log.d("create table", "table created");
 		String sql = "CREATE TABLE " + TABLE_NAME + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-				+ DBColumns.RATE + " TEXT, " + DBColumns.BUY_CELL + " INTEGER);";
+				+ DBColumns.RATE + " TEXT, " + DBColumns.BUY_SELL + " INTEGER);";
 		db.execSQL(sql);
 		fillDatabase(db);
 	}
@@ -53,7 +53,7 @@ public class DBHelper extends SQLiteOpenHelper {
 					for (int j = 0; j < c; j++) {
 						ContentValues cv = new ContentValues();
 						cv.put(DBColumns.RATE, bd.toString());
-						cv.put(DBColumns.BUY_CELL, r.nextInt(2));
+						cv.put(DBColumns.BUY_SELL, r.nextInt(2));
 						db.insert(TABLE_NAME, null, cv);
 					}
 					bd = bd.add((delta));
@@ -73,7 +73,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	static interface DBColumns {
 		static final String RATE = "rate";
-		static final String BUY_CELL = "buy_cell";
-		
+		static final String BUY_SELL = "buy_Sell";
+		static final String COUNT = "count(*)";
 	}
 }
