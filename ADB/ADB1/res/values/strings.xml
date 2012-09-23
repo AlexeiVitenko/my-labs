@@ -9,5 +9,12 @@
     <string name="draw_histogrm">Draw Histogram</string>    <string name="start_rate">Min. rate</string>
     <string name="finish_rate">Max. rate</string>
     <string name="choose_range">Choose range:</string>
-
+    <string name="send_mail">Send via E-Mail</string>
+    <string name="send">Send</string>
+    <string name="send_via">Send via:</string>
+    <string name="rates_range">Rates from %1$.2f to %2$.2f.</string>
+    <string name="message_text">Look at my results!</string>
+    <string name="count">Count</string>
+    <string name="rate">Rate</string>
+    <string name="statistics">Statistics</string>
 </resources>
