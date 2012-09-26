@@ -19,4 +19,5 @@
     <string name="statistics">Statistics</string>
     <string name="buy">Buy</string>
     <string name="sell">Sell</string>
+    <string name="no_math_found">No match found!</string>
 </resources>
