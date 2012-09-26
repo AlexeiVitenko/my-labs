@@ -22,16 +22,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.PointF;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.androidplot.Plot;
 import com.androidplot.xy.BoundaryMode;
@@ -58,13 +63,31 @@ public class HistogramActivity extends Activity implements OnTouchListener {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.plot);
 
         mMinRate = getIntent().getStringExtra(MIN_RATE_EXTRA);
         mMaxRate = getIntent().getStringExtra(MAX_RATE_EXTRA);
         CursorQueryHandler cqh = new CursorQueryHandler(this, new DBHelper(this).getReadableDatabase());
         mCursor = cqh.getWithRates(mMinRate, mMaxRate);
         List<Operation> operations = cqh.getOperationsList(mCursor);
+        if (operations.size() <= 0) {
+            TextView tv = new TextView(this);
+            tv.setText(R.string.no_math_found);
+            tv.setTextSize(30);
+            tv.setTypeface(Typeface.DEFAULT_BOLD);
+            LayoutParams lp = new LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER;
+            LinearLayout l = new LinearLayout(this);
+            l.setLayoutParams(lp);
+            l.addView(tv);
+            setContentView(l);
+        } else {
+            initPlot(operations);
+
+        }
+
+    }
+
+    private void initPlot(List<Operation> operations) {
         Collections.sort(operations, new Comparator<Operation>() {
 
             @Override
@@ -72,7 +95,7 @@ public class HistogramActivity extends Activity implements OnTouchListener {
                 return lhs.rate.compareTo(rhs.rate);
             }
         });
-        mySimpleXYPlot = (XYPlot) findViewById(R.id.mySimpleXYPlot);
+        mySimpleXYPlot = new XYPlot(this, getString(R.string.statistics));
 
         List<Float> xP = new ArrayList<Float>();
         List<Integer> yP = new ArrayList<Integer>();
@@ -80,7 +103,7 @@ public class HistogramActivity extends Activity implements OnTouchListener {
         List<Integer> yN = new ArrayList<Integer>();
         List<Integer> xDelta = new ArrayList<Integer>();
         for (Operation operation : operations) {
-            Log.d("operation", ""+operation.rate.toString() + " " + operation.count + " " + operation.buy_sell);
+            Log.d("operation", "" + operation.rate.toString() + " " + operation.count + " " + operation.buy_sell);
             if (operation.buy_sell) {
                 xP.add(operation.rate.floatValue());
                 yP.add(operation.count);
@@ -90,11 +113,11 @@ public class HistogramActivity extends Activity implements OnTouchListener {
 
             }
         }
-        
+
         for (int i = 0; i < xP.size(); i++) {
             xDelta.add(yP.get(i) - yN.get(i));
         }
-        
+
         mySimpleXYPlot.getGraphWidget().getGridBackgroundPaint().setColor(Color.WHITE);
         mySimpleXYPlot.getGraphWidget().getGridLinePaint().setColor(Color.BLACK);
         mySimpleXYPlot.getGraphWidget().getGridLinePaint().setPathEffect(new DashPathEffect(new float[] { 1, 1 }, 1));
@@ -112,14 +135,15 @@ public class HistogramActivity extends Activity implements OnTouchListener {
                 return new Integer(lhs.count).compareTo(rhs.count);
             }
         });
-        
-        mySimpleXYPlot.setRangeBoundaries(Collections.min(xDelta) <= 0? Collections.min(xDelta) - 10: 0, operations.get(operations.size() - 1).count + 10, BoundaryMode.FIXED);
+
+        mySimpleXYPlot.setRangeBoundaries(Collections.min(xDelta) <= 0 ? Collections.min(xDelta) - 10 : 0,
+                operations.get(operations.size() - 1).count + 10, BoundaryMode.FIXED);
         mySimpleXYPlot.addSeries(new SimpleXYSeries(xP, yP, "BUY"), new LineAndPointFormatter(Color.RED, Color.MAGENTA,
                 Color.TRANSPARENT));
         mySimpleXYPlot.addSeries(new SimpleXYSeries(xN, yN, "SELL"), new LineAndPointFormatter(Color.BLUE, Color.CYAN,
                 Color.TRANSPARENT));
-        mySimpleXYPlot.addSeries(new SimpleXYSeries(xN, xDelta, "BUY - SELL"), new LineAndPointFormatter(Color.GREEN, Color.GREEN,
-                Color.TRANSPARENT));
+        mySimpleXYPlot.addSeries(new SimpleXYSeries(xN, xDelta, "BUY - SELL"), new LineAndPointFormatter(Color.GREEN,
+                Color.GREEN, Color.TRANSPARENT));
         mySimpleXYPlot.setDomainStepValue(5);
         mySimpleXYPlot.setTicksPerRangeLabel(3);
         mySimpleXYPlot.setDomainLabel(getString(R.string.rate));
@@ -143,7 +167,7 @@ public class HistogramActivity extends Activity implements OnTouchListener {
         mMaxSpain = mMinSpain * 10f;
         mMaxX = maxXY.x;
         mMinX = minXY.x;
-
+        setContentView(mySimpleXYPlot);
     }
 
     @Override
@@ -166,7 +190,7 @@ public class HistogramActivity extends Activity implements OnTouchListener {
     @Override
     public boolean onTouch(View arg0, MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
-        case MotionEvent.ACTION_DOWN: 
+        case MotionEvent.ACTION_DOWN:
             firstFinger = new PointF(event.getX(), event.getY());
             mode = ONE_FINGER_DRAG;
             break;
@@ -192,7 +216,7 @@ public class HistogramActivity extends Activity implements OnTouchListener {
             }, 0);
             mode = ONE_FINGER_DRAG;
             break;
-        case MotionEvent.ACTION_POINTER_DOWN: 
+        case MotionEvent.ACTION_POINTER_DOWN:
             distBetweenFingers = spacing(event);
             if (distBetweenFingers > 5f) {
                 mode = TWO_FINGERS_DRAG;
