@@ -74,7 +74,8 @@ public class HistogramActivity extends Activity implements OnTouchListener {
             tv.setText(R.string.no_math_found);
             tv.setTextSize(30);
             tv.setTypeface(Typeface.DEFAULT_BOLD);
-            LayoutParams lp = new LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            LayoutParams lp = new LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER;
             LinearLayout l = new LinearLayout(this);
             l.setLayoutParams(lp);
