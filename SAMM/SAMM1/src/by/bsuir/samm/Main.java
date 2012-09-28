@@ -67,7 +67,7 @@ public class Main implements PropertyChangeListener {
         frame.getContentPane().setLayout(null);
 
         JPanel panel = new JPanel();
-        panel.setBounds(0, 0, 184, 600);
+        panel.setBounds(0, 0, 184, 562);
         frame.getContentPane().add(panel);
         panel.setLayout(null);
 
@@ -81,7 +81,7 @@ public class Main implements PropertyChangeListener {
         panel_1.add(lblA);
 
         textField = new JTextField();
-        textField.setText("1");
+        textField.setText("22695477");
         textField.setBounds(44, 10, 114, 19);
         panel_1.add(textField);
         textField.setColumns(10);
@@ -96,7 +96,7 @@ public class Main implements PropertyChangeListener {
         panel_2.add(lblR);
 
         textField_1 = new JTextField();
-        textField_1.setText("22695477");
+        textField_1.setText("1");
         textField_1.setBounds(44, 10, 114, 19);
         panel_2.add(textField_1);
         textField_1.setColumns(10);
@@ -147,31 +147,36 @@ public class Main implements PropertyChangeListener {
         panel.add(btnRandomize);
 
         JPanel panel_4 = new JPanel();
-        panel_4.setBounds(186, 0, 564, 263);
+        panel_4.setBounds(186, 0, 548, 263);
         frame.getContentPane().add(panel_4);
         panel_4.setLayout(null);
 
+        lblHistogramlabel = new JLabel("");
+        lblHistogramlabel.setBounds(0, 0, 548, 263);
+        panel_4.add(lblHistogramlabel);
+
+        JScrollPane scrollPane_1 = new JScrollPane();
+        scrollPane_1.setBounds(186, 299, 548, 263);
+        frame.getContentPane().add(scrollPane_1);
+
+        textArea = new JTextArea();
+        scrollPane_1.setViewportView(textArea);
+
+        JLabel label = new JLabel("Результат:");
+        label.setBounds(196, 274, 76, 14);
+        frame.getContentPane().add(label);
+
+        lblResult = new JLabel("");
+        lblResult.setBounds(268, 274, 46, 14);
+        frame.getContentPane().add(lblResult);
+
         progressBar = new JProgressBar();
-        progressBar.setBounds(177, 131, 197, 23);
+        progressBar.setBounds(527, 274, 197, 19);
+        frame.getContentPane().add(progressBar);
         progressBar.setStringPainted(true);
-        panel_4.add(progressBar);
-                
-                JScrollPane scrollPane_1 = new JScrollPane();
-                scrollPane_1.setBounds(186, 299, 548, 263);
-                frame.getContentPane().add(scrollPane_1);
-        
-                textArea = new JTextArea();
-                scrollPane_1.setViewportView(textArea);
-                
-                JLabel label = new JLabel("Результат:");
-                label.setBounds(196, 274, 76, 14);
-                frame.getContentPane().add(label);
-                
-                lblResult = new JLabel("");
-                lblResult.setBounds(268, 274, 46, 14);
-                frame.getContentPane().add(lblResult);
     }
-    
+
+    private JLabel lblHistogramlabel;
     private JLabel lblResult;
 
     private void start() {
@@ -189,6 +194,7 @@ public class Main implements PropertyChangeListener {
     private void runWorker(long a, long r, long m, long g) {
         lemer = new LemerRandom(a, r, m, g);
         progressBar.setMaximum(100);
+        progressBar.setValue(0);
         lemer.addPropertyChangeListener(this);
         lemer.execute();
         textArea.setText("");
@@ -203,20 +209,28 @@ public class Main implements PropertyChangeListener {
             textArea.setText(lemer.getSb().toString());
         }
         if ((evt.getNewValue()).equals(StateValue.DONE)) {
-            progressBar.setValue(0);
-            try {
-                lblResult.setText(""+lemer.getResult().size());
-                textArea.setText(lemer.getSb().toString());
-                if (!lemer.get()) {
-                    JOptionPane.showMessageDialog(null, "FAIL!");
-                }
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            onComplete();
+        }
+    }
+
+    private void onComplete(){
+        try {
+            lblResult.setText(""+lemer.getResult().size());
+            
+            StringBuilder sb = new StringBuilder();
+            for (Float f : lemer.getResult()){
+                sb.append(String.format("%.6f", f) + "\n");
             }
+            textArea.setText(sb.toString());
+            Historgam h = new Historgam(lblHistogramlabel, lemer.getResult());
+            h.draw();
+            if (!lemer.get()) {
+                JOptionPane.showMessageDialog(null, "FAIL!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
     }
 }

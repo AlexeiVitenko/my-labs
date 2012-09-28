@@ -1,6 +1,7 @@
 package by.bsuir.samm;
 
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.SwingWorker;
@@ -12,7 +13,7 @@ public class LemerRandom extends SwingWorker<Boolean, Integer> {
 	private long m;
 	private long goal;
 	private Set<Long> numbers = new TreeSet<Long>();
-	private Set<Float> result = new TreeSet<Float>();
+	private SortedSet<Float> result = new TreeSet<Float>();
 	private StringBuilder sb = new StringBuilder();
 
 	public LemerRandom(long a, long r, long m, long goal) {
@@ -45,13 +46,7 @@ public class LemerRandom extends SwingWorker<Boolean, Integer> {
 			float res = (float)nextR/m;
 			result.add(res);
 			sb.append(res + "\n");
-		} while (numbers.size() < goal);
+		} while (result.size() < goal);
 		return true;
-	}
-	
-	@Override
-	protected void done() {
-	    // TODO Auto-generated method stub
-	    super.done();
 	}
 }
