@@ -2,11 +2,14 @@ package by.bsuir.samm;
 
 import java.awt.EventQueue;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import java.awt.CardLayout;
 import javax.swing.JProgressBar;
 import javax.swing.JButton;
@@ -199,6 +202,7 @@ public class Main implements PropertyChangeListener {
         lemer.execute();
         textArea.setText("");
         lblResult.setText("");
+        lblHistogramlabel.setIcon(new ImageIcon());
     }
 
     @Override
@@ -222,8 +226,14 @@ public class Main implements PropertyChangeListener {
                 sb.append(String.format("%.6f", f) + "\n");
             }
             textArea.setText(sb.toString());
-            Historgam h = new Historgam(lblHistogramlabel, lemer.getResult());
-            h.draw();
+            SwingUtilities.invokeLater(new Runnable() {
+                
+                @Override
+                public void run() {
+                    Historgam h = new Historgam(lblHistogramlabel, lemer.getResult());
+                    h.draw();
+                }
+            });
             if (!lemer.get()) {
                 JOptionPane.showMessageDialog(null, "FAIL!");
             }
