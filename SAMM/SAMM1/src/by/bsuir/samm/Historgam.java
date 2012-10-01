@@ -38,7 +38,7 @@ public class Historgam {
     private void drawHistogram(Graphics graph) {
         int width = mImage.getWidth() - RECT_PADDING - O.x;
         int height = O.y - RECT_PADDING;
-
+        int maxCount = -1;
         int i = 0;
         float max = 0.05f;
         for (Float f : mData) {
@@ -46,9 +46,16 @@ public class Historgam {
             if (f > max) {
                 drawRect(graph, max, i, width, height);
                 max += 0.05f;
+                if (i > maxCount) {
+                    maxCount = i;
+                }
                 i = 0;
             }
         }
+        graph.drawLine(O.x - 5, O.y - ((int) ((maxCount / (float) mData.size() * height * 15))), O.x + 5, O.y
+                - ((int) ((maxCount / (float) mData.size() * height * 15))));
+        graph.setColor(Color.BLACK);
+        graph.drawString("" + maxCount, O.x + 3, O.y - ((int) ((maxCount / (float) mData.size() * height * 15))) - 5);
     }
 
     private void drawRect(Graphics graph, float max, int i, int width, int height) {
