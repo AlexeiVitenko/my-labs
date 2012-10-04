@@ -27,7 +27,7 @@ public class LemerRandom extends SwingWorker<Boolean, Integer> {
         return sb;
     }
 	
-	public Set<Float> getResult() {
+	public SortedSet<Float> getResult() {
         return result;
     }
 	
