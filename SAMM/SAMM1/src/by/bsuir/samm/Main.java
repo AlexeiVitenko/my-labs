@@ -21,6 +21,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -65,6 +68,7 @@ public class Main implements PropertyChangeListener {
      */
     private void initialize() {
         frame = new JFrame();
+        frame.setResizable(false);
         frame.setBounds(100, 100, 750, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
@@ -148,6 +152,48 @@ public class Main implements PropertyChangeListener {
         });
         btnRandomize.setBounds(15, 163, 117, 25);
         panel.add(btnRandomize);
+        
+        JPanel panel_6 = new JPanel();
+        panel_6.setBounds(5, 193, 169, 358);
+        panel.add(panel_6);
+        panel_6.setLayout(null);
+        
+        JLabel label_1 = new JLabel("Дисперсия:");
+        label_1.setBounds(18, 11, 69, 14);
+        panel_6.add(label_1);
+        
+        JLabel label_2 = new JLabel("Ожидание:");
+        label_2.setBounds(18, 36, 69, 14);
+        panel_6.add(label_2);
+        
+        JLabel lbln = new JLabel("Отклонение:");
+        lbln.setBounds(10, 61, 77, 14);
+        panel_6.add(lbln);
+        
+        JButton button = new JButton("Рассчитать");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                startCalcuclating();
+            }
+        });
+        button.setBounds(10, 86, 149, 23);
+        panel_6.add(button);
+        
+        lblDisp = new JLabel("");
+        lblDisp.setBounds(94, 11, 65, 14);
+        panel_6.add(lblDisp);
+        
+        lblMat = new JLabel("");
+        lblMat.setBounds(94, 36, 65, 14);
+        panel_6.add(lblMat);
+        
+        lblOtkl = new JLabel("");
+        lblOtkl.setBounds(89, 61, 70, 14);
+        panel_6.add(lblOtkl);
+        
+        lblShod = new JLabel("");
+        lblShod.setBounds(10, 126, 149, 33);
+        panel_6.add(lblShod);
 
         JPanel panel_4 = new JPanel();
         panel_4.setBounds(186, 0, 548, 263);
@@ -178,10 +224,13 @@ public class Main implements PropertyChangeListener {
         frame.getContentPane().add(progressBar);
         progressBar.setStringPainted(true);
     }
-
+    private JLabel lblDisp;
     private JLabel lblHistogramlabel;
     private JLabel lblResult;
-
+    private JLabel lblMat;
+    private JLabel lblOtkl;
+    private JLabel lblShod;
+    
     private void start() {
         try {
             long a = Long.parseLong(textField.getText());
@@ -242,5 +291,35 @@ public class Main implements PropertyChangeListener {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void startCalcuclating(){
+        SortedSet<Float> res = lemer.getResult();
+        float value = 0;
+        for (Float float1 : res) {
+            value += float1;
+        }
+        value /= res.size();
+        lblMat.setText(""+value);
+        
+        float disp = 0;
+        for (Float float1 : res) {
+            disp += float1*float1 - value * value;
+        }
+        disp /= res.size();
+        disp *= (res.size()/((float)(res.size()-1)));
+        lblDisp.setText(""+disp);
+        lblOtkl.setText(""+Math.sqrt(disp));
+        int k = 0;
+        ArrayList<Float> result = new ArrayList<Float>(res);
+        for (int i = 1; i < res.size(); i+=2) {
+            float x1 = result.get(i-1);
+            float x2 = result.get(i);
+            if ((x1*x1+x2*x2)<1f) {
+                k++;
+            }
+        }
+        
+        lblShod.setText(""+((2f*k/res.size())/(Math.PI/4f)));
     }
 }
