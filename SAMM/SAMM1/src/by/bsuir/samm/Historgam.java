@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 public class Historgam {
     private static final int PADDING = 10;
     private static final int RECT_PADDING = 30;
-
+    int mult = 1;
     private Point O;
     private JLabel dst;
     private BufferedImage mImage;
@@ -21,7 +21,7 @@ public class Historgam {
     public Historgam(JLabel label, Set<Float> data) {
         dst = label;
         mData = data;
-        mImage = new BufferedImage(label.getWidth(), label.getHeight(), BufferedImage.TYPE_INT_RGB);
+        mImage = new BufferedImage(label.getWidth(), label.getHeight(), BufferedImage.TYPE_INT_RGB);                                                                                                                if (mData.size()>100) mult = 15;
     }
 
     public void draw() {
@@ -42,6 +42,9 @@ public class Historgam {
         int i = 0;
         float max = 0.05f;
         for (Float f : mData) {
+            while (f >= max + 0.05){
+                max += 0.05f;
+            }
             i++;
             if (f > max) {
                 drawRect(graph, max, i, width, height);
@@ -52,15 +55,17 @@ public class Historgam {
                 i = 0;
             }
         }
-        graph.drawLine(O.x - 5, O.y - ((int) ((maxCount / (float) mData.size() * height * 15))), O.x + 5, O.y
-                - ((int) ((maxCount / (float) mData.size() * height * 15))));
+        graph.drawLine(O.x - 5, O.y - ((int) ((maxCount / (float) mData.size() * height * mult))), O.x + 5, O.y
+                - ((int) ((maxCount / (float) mData.size() * height * mult))));
         graph.setColor(Color.BLACK);
-        graph.drawString("" + maxCount, O.x + 3, O.y - ((int) ((maxCount / (float) mData.size() * height * 15))) - 5);
+        graph.drawString("" + maxCount, O.x + 3, O.y - ((int) ((maxCount / (float) mData.size() * height * mult))) - 5);
     }
 
+     
+    
     private void drawRect(Graphics graph, float max, int i, int width, int height) {
-        graph.drawRect((int) (O.x + (max - 0.05f) * width), O.y - ((int) ((i / (float) mData.size()) * height * 15)),
-                (int) ((0.05) * width), (int) ((i / (float) mData.size()) * height * 15));
+        graph.drawRect((int) (O.x + (max - 0.05f) * width), O.y - ((int) ((i / (float) mData.size()) * height * mult)),
+                (int) ((0.05) * width), (int) ((i / (float) mData.size()) * height * mult));
     }
 
     private void drawCoordinates(Graphics graph) {
