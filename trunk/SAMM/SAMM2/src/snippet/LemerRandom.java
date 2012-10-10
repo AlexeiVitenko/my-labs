@@ -55,7 +55,7 @@ public class LemerRandom {
 
     private void setProgress(int p) throws UnsupportedEncodingException {
         if (p > progress) {
-            System.out.print("Generate random numbers: " + p + "              \r");
+            System.out.print("Generate random numbers: " + p + "%              \r");
             progress = p;
         }
     }
