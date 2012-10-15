@@ -1,21 +1,13 @@
 package by.bsuir.poit.dsp;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.XYDataItem;
 
-public class Polyharmonic {
-
-    private double A;
+public class Polyharmonic extends Chart {
     private double[] f;
     private double[] phi;
-    private int N;
 
     public Polyharmonic(double _a, int _n, double _f, double[] _phi) {
-        N = Harmonic.N_VALUES[_n];
-        A = _a;
+        super(_a, _n);
         f = new double[5];
         for (int i = 0; i < 5; i++) {
             f[i] = _f + i;
@@ -23,22 +15,18 @@ public class Polyharmonic {
         phi = _phi;
     }
 
-    public void makeChart() {
-        double results[][] = new double[2][N];
-        for (int i = 0; i < N; i++) {
-            float result = 0;
-            for (int j = 0; j < phi.length; j++) {
-                result += A * Math.sin(2 * Math.PI * f[j] * i / N + phi[j]);
-            }
-            results[1][i] = result;
-            results[0][i] = i;
+    @Override
+    protected String dumpParams() {
+        return "";
+    }
+
+    @Override
+    protected XYDataItem getData(int index) {
+        float result = 0;
+        for (int j = 0; j < phi.length; j++) {
+            result += A * Math.sin(2 * Math.PI * f[j] * index / N + phi[j]);
         }
-        DefaultXYDataset xy = new DefaultXYDataset();
-        xy.addSeries("bla-bla", results);
-        JFreeChart chart = ChartFactory.createXYLineChart("Chart", "", "", xy, PlotOrientation.VERTICAL, false, false,
-                false);
-        ChartFrame cf = new ChartFrame("frame", chart);
-        cf.setBounds(0, 0, 750, 500);
-        cf.setVisible(true);
+        return new XYDataItem(index, result);
+
     }
 }
