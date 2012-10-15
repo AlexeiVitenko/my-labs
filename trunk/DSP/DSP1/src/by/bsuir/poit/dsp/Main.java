@@ -45,7 +45,6 @@ public class Main {
                             h.setF(Double.parseDouble(com));
                             break;
                         case 'p':
-                            String[] values = com.split(" ");
                             h.setPhi(Integer.parseInt(com) * Math.PI / Integer.parseInt(scanner.next()));
                             break;
                         default:
