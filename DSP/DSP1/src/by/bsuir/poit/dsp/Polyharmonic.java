@@ -3,8 +3,8 @@ package by.bsuir.poit.dsp;
 import org.jfree.data.xy.XYDataItem;
 
 public class Polyharmonic extends Chart {
-    private double[] f;
-    private double[] phi;
+    protected double[] f;
+    protected double[] phi;
 
     public Polyharmonic(double _a, int _n, double _f, double[] _phi) {
         super(_a, _n);
@@ -27,6 +27,5 @@ public class Polyharmonic extends Chart {
             result += A * Math.sin(2 * Math.PI * f[j] * index / N + phi[j]);
         }
         return new XYDataItem(index, result);
-
     }
 }
