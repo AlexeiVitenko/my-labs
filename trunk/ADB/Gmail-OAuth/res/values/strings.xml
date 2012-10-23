@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">GMail OAuth Demo</string>
-    <string name="send_sample_email">Send Sample Email</string>
+    <string name="send_email">Send Email</string>
     <string name="configure_oauth">Configure</string>
     <string name="clear_oauth">Clear</string>
     <string name="oauth_not_set_up">Please set up email gateway.</string>
@@ -16,5 +16,8 @@
     <string name="error_internal">An internal error occurred while sending email: %s</string>
     <string name="email_subject">From %s</string>
     <string name="please_wait">Please wait...</string>
-
+    <string name="add_recepient">Add recepient</string>
+    <string name="add">Add</string>
+    <string name="email">E-mail</string>
+    <string name="keep">Keep it empty to send standart text.</string>
 </resources>

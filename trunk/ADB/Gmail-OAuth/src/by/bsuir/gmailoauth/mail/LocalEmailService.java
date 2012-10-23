@@ -15,6 +15,7 @@ import org.scribe.utils.OAuthEncoder;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
@@ -22,32 +23,30 @@ import android.util.Pair;
 
 import by.bsuir.gmailoauth.R;
 import by.bsuir.gmailoauth.UserData;
+import by.bsuir.gmailoauth.data.DBHelper;
+import by.bsuir.gmailoauth.data.DBHelper.DBColumns;
+import by.bsuir.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 import by.bsuir.gmailoauth.util.OAuthBuilder;
 import by.bsuir.gmailoauth.util.OAuthHelper;
 
-
-public class LocalEmailService extends Service
-{
+public class LocalEmailService extends Service {
     private static final String TAG = "LocalEmailService";
 
     private static LocalEmailService instance;
 
-    public static LocalEmailService get()
-    {
+    public static LocalEmailService get() {
         return instance;
     }
 
     private SharedPreferences prefs;
 
     @Override
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
         instance = this;
         prefs = UserData.getPrefs(this);
@@ -55,26 +54,17 @@ public class LocalEmailService extends Service
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "LocalEmailService: onDestroy");
     }
 
-    public boolean isSetUp()
-    {
+    public boolean isSetUp() {
         return prefs.getString(UserData.PREF_KEY_TARGET_EMAIL_ADDRESS, null) != null;
     }
 
-    public void sendEmail(String subject, String text, EmailTaskCallback callback)
-    {
-        if (!UserData.isEmailSetUp())
-        {
-            Log.e(TAG, "Please set the target email address.");
-            return;
-        }
-        if (!UserData.isOAuthSetUp())
-        {
+    public void sendEmail(String subject, String text, EmailTaskCallback callback) {
+        if (!UserData.isOAuthSetUp()) {
             Log.e(TAG, "Please configure email send method.");
             return;
         }
@@ -86,48 +76,39 @@ public class LocalEmailService extends Service
         emailSendTask.execute(targetEmailAddress, subject, text);
     }
 
-    public interface EmailTaskCallback
-    {
+    public interface EmailTaskCallback {
         void emailTaskDone(Boolean result, String errorMessage);
     }
 
-    private static class EmailTaskResponseType extends Pair<Boolean, String>
-    {
-        private EmailTaskResponseType(Boolean first, String second)
-        {
+    private static class EmailTaskResponseType extends Pair<Boolean, String> {
+        private EmailTaskResponseType(Boolean first, String second) {
             super(first, second);
         }
 
-        public static EmailTaskResponseType create(Boolean first, String second)
-        {
+        public static EmailTaskResponseType create(Boolean first, String second) {
             return new EmailTaskResponseType(first, second);
         }
 
-        public String toString()
-        {
+        public String toString() {
             return "" + first + ":" + second;
         }
     }
 
-    private class EmailSendTask extends AsyncTask<String, Void, EmailTaskResponseType>
-    {
+    private class EmailSendTask extends AsyncTask<String, Void, EmailTaskResponseType> {
         private final String fromEmail;
         private final String xoauthString;
         private final EmailTaskCallback callback;
 
-        public EmailSendTask(String fromEmail, String xoauthString, EmailTaskCallback callback)
-        {
+        public EmailSendTask(String fromEmail, String xoauthString, EmailTaskCallback callback) {
             this.fromEmail = fromEmail;
             this.xoauthString = xoauthString;
             this.callback = callback;
         }
 
         @Override
-        protected EmailTaskResponseType doInBackground(String... params)
-        {
+        protected EmailTaskResponseType doInBackground(String... params) {
             Log.i(TAG, "Sending email: " + params);
-            if (params.length < 3)
-            {
+            if (params.length < 3) {
                 Log.wtf(TAG, "Insufficient parameters: " + params);
                 return EmailTaskResponseType.create(false,
                         getString(R.string.error_internal, "Insufficient parameters to email task."));
@@ -136,29 +117,65 @@ public class LocalEmailService extends Service
             String subject = params[1];
             String text = params[2];
 
-            try
-            {
+            try {
                 OAuthGMailSender sender = new OAuthGMailSender(xoauthString);
                 sender.sendMail(subject, text, fromEmail, email);
                 return EmailTaskResponseType.create(true, null);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Log.e(TAG, "An error occurred while sending email: " + e, e);
                 return EmailTaskResponseType.create(false, "Error sending email: " + e.getMessage());
             }
         }
 
         @Override
-        protected void onPostExecute(EmailTaskResponseType result)
-        {
+        protected void onPostExecute(EmailTaskResponseType result) {
             Log.i(TAG, "Email sent, result: " + result);
             callback.emailTaskDone(result.first, result.second);
         }
     }
 
-    private String buildXOAuth()
-    {
+    private class EmailsSendTask extends AsyncTask<String, Void, EmailTaskResponseType> {
+        private final String fromEmail;
+        private final String xoauthString;
+        private final EmailTaskCallback callback;
+        private final Cursor mCursor;
+
+        public EmailsSendTask(Cursor c, String from, String xoauthString, EmailTaskCallback callback) {
+            mCursor = c;
+            this.fromEmail = from;
+            this.xoauthString = xoauthString;
+            this.callback = callback;
+        }
+
+        @Override
+        protected EmailTaskResponseType doInBackground(String... params) {
+
+            try {
+                int mailIndex = mCursor.getColumnIndex(DBColumns.MAIL);
+                int textIndex = mCursor.getColumnIndex(DBColumns.TEXT);
+                if (mCursor.moveToFirst()) {
+                    do {
+
+                        OAuthGMailSender sender = new OAuthGMailSender(xoauthString);
+                        sender.sendMail("bla-bla-bla", mCursor.getString(textIndex), fromEmail,
+                                mCursor.getString(mailIndex));
+                    } while (mCursor.moveToNext());
+                }
+                return EmailTaskResponseType.create(true, null);
+            } catch (Exception e) {
+                Log.e(TAG, "An error occurred while sending email: " + e, e);
+                return EmailTaskResponseType.create(false, "Error sending email: " + e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPostExecute(EmailTaskResponseType result) {
+            Log.i(TAG, "Email sent, result: " + result);
+            callback.emailTaskDone(result.first, result.second);
+        }
+    }
+
+    private String buildXOAuth() {
         String fromEmail = prefs.getString(UserData.PREF_KEY_OAUTH_EMAIL_ADDRESS, null);
         String url = String.format(OAuthHelper.URL_SMTP_AUTH, fromEmail);
         OAuthRequest request = new OAuthRequest(Verb.GET, url);
@@ -172,8 +189,7 @@ public class LocalEmailService extends Service
                 OAuthConstants.SCOPE, OAuthConstants.SIGN_METHOD, OAuthConstants.SIGNATURE, OAuthConstants.VERIFIER,
                 OAuthConstants.TOKEN, OAuthConstants.VERSION, OAuthConstants.CONSUMER_KEY));
         int i = 0;
-        for (Entry<String, String> entry : request.getOauthParameters().entrySet())
-        {
+        for (Entry<String, String> entry : request.getOauthParameters().entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             if (!requiredParams.contains(key))
@@ -189,15 +205,24 @@ public class LocalEmailService extends Service
         Log.d(TAG, "xoauth encoding " + sb);
 
         Base64 base64 = new Base64();
-        try
-        {
+        try {
             byte[] buf = base64.encode(sb.toString().getBytes("utf-8"));
             return new String(buf, "utf-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
+        } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "Invalid XOAUTH string: " + sb, e);
         }
         return null;
+    }
+
+    public void sendEmails(EmailTaskCallback emailTaskCallback) {
+        if (!UserData.isOAuthSetUp()) {
+            Log.e(TAG, "Please configure email send method.");
+            return;
+        }
+        String xoauthString = buildXOAuth();
+        Log.d(TAG, "XOAuth: " + xoauthString);
+        String fromEmail = prefs.getString(UserData.PREF_KEY_OAUTH_EMAIL_ADDRESS, null);
+        EmailsSendTask emailSendTask = new EmailsSendTask(DBHelper.getInstance(getApplicationContext()).getAll(),fromEmail, xoauthString, emailTaskCallback);
+        emailSendTask.execute();
     }
 }
