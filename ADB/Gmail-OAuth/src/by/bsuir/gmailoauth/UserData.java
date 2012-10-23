@@ -34,11 +34,6 @@ public class UserData
         }
     }
 
-    public static boolean isEmailSetUp()
-    {
-        return getPrefs() != null && getPrefs().getString(UserData.PREF_KEY_TARGET_EMAIL_ADDRESS, null) != null;
-    }
-
     public static boolean isEmailServiceAvailable()
     {
         return LocalEmailService.get() != null;

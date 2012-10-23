@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="10dp" >
-	</LinearLayout>
-    
-    <EditText
-        android:id="@+id/emailtextbox"
+    <ListView 
+        android:id="@+id/m_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10" >
-    </EditText>
-
-	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content">
-
-	    <Button
-	        android:id="@+id/saveemailbutton"
-	        android:layout_width="200dp"
-	        android:layout_height="wrap_content"
-	        android:text="@string/send_sample_email"
-            android:layout_alignParentRight="true" />
-	    	    
-    </RelativeLayout>
-
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="10dp" >
-	</LinearLayout>
-    
-    <TextView
-        android:id="@+id/oauthresult"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dp"/>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/add_new"
+        ></ListView>
 
     <EditText
+        android:layout_above="@+id/m_bottom"
         android:id="@+id/oauthemailtextbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:ems="10" >
+        android:ems="10"
+        android:enabled="false" >
     </EditText>
-
-	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content">
+    
+    <Button 
+        android:id="@+id/add_new"
+        android:layout_above="@id/oauthemailtextbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_recepient"
+        android:onClick="addRec"
+        />
+    
+    <LinearLayout
+        android:id="@+id/m_bottom"
+        android:layout_above="@+id/oauthresult"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
 
         <Button
             android:id="@+id/configoauthbutton"
-	        android:layout_width="100dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/configure_oauth"
-            android:layout_alignParentRight="true" />
+            android:layout_weight="1."
+            android:singleLine="true"
+            android:text="@string/configure_oauth" />
 
         <Button
             android:id="@+id/clearoauthbutton"
-	        android:layout_width="100dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/clear_oauth"
-            android:layout_toLeftOf="@id/configoauthbutton" />
+            android:layout_weight="1."
+            android:singleLine="true"
+            android:text="@string/clear_oauth" />
+
+        <Button
+            android:id="@+id/saveemailbutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1."
+            android:singleLine="true"
+            android:text="@string/send_email" />
+    </LinearLayout>
+    <TextView 
+        android:id="@+id/oauthresult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         
-    </RelativeLayout>
-    
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>
