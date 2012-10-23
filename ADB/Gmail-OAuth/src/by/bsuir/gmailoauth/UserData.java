@@ -1,12 +1,13 @@
-package com.tinywebgears.gmailoauth;
+package by.bsuir.gmailoauth;
 
 import org.scribe.model.Token;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import by.bsuir.gmailoauth.R;
+import by.bsuir.gmailoauth.mail.LocalEmailService;
 
-import com.tinywebgears.gmailoauth.mail.LocalEmailService;
 
 public class UserData
 {

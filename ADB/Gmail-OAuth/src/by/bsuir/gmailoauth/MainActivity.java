@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth;
+package by.bsuir.gmailoauth;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,9 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import by.bsuir.gmailoauth.R;
+import by.bsuir.gmailoauth.mail.LocalEmailService;
+import by.bsuir.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 
-import com.tinywebgears.gmailoauth.mail.LocalEmailService;
-import com.tinywebgears.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 
 public class MainActivity extends Activity
 {

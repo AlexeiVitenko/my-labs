@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth;
+package by.bsuir.gmailoauth;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,9 +10,10 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import by.bsuir.gmailoauth.R;
+import by.bsuir.gmailoauth.util.OAuthBuilder;
+import by.bsuir.gmailoauth.util.OAuthHelper;
 
-import com.tinywebgears.gmailoauth.util.OAuthBuilder;
-import com.tinywebgears.gmailoauth.util.OAuthHelper;
 
 public class GoogleOAuthActivity extends Activity
 {

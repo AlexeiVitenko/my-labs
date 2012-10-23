@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth.util;
+package by.bsuir.gmailoauth.util;
 
 public class UriUtil
 {
