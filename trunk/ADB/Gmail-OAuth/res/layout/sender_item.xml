@@ -13,6 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@+id/si_remove"
         android:textSize="18sp"
+        android:singleLine="true"
         />
     <Button 
         android:layout_width="wrap_content"
