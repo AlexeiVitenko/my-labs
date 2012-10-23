@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth.util;
+package by.bsuir.gmailoauth.util;
 
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Token;

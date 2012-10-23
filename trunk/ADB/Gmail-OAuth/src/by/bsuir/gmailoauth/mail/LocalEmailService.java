@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth.mail;
+package by.bsuir.gmailoauth.mail;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -20,10 +20,11 @@ import android.os.IBinder;
 import android.util.Log;
 import android.util.Pair;
 
-import com.tinywebgears.gmailoauth.R;
-import com.tinywebgears.gmailoauth.UserData;
-import com.tinywebgears.gmailoauth.util.OAuthBuilder;
-import com.tinywebgears.gmailoauth.util.OAuthHelper;
+import by.bsuir.gmailoauth.R;
+import by.bsuir.gmailoauth.UserData;
+import by.bsuir.gmailoauth.util.OAuthBuilder;
+import by.bsuir.gmailoauth.util.OAuthHelper;
+
 
 public class LocalEmailService extends Service
 {

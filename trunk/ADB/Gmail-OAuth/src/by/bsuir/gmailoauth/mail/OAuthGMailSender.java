@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth.mail;
+package by.bsuir.gmailoauth.mail;
 
 import java.io.PrintWriter;
 import java.io.Writer;

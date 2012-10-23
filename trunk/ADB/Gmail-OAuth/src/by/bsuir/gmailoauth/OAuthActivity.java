@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth;
+package by.bsuir.gmailoauth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,9 +14,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import by.bsuir.gmailoauth.R;
+import by.bsuir.gmailoauth.util.OAuthBuilder;
+import by.bsuir.gmailoauth.util.OAuthHelper;
 
-import com.tinywebgears.gmailoauth.util.OAuthBuilder;
-import com.tinywebgears.gmailoauth.util.OAuthHelper;
 
 public class OAuthActivity extends Activity
 {

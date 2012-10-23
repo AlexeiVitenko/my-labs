@@ -1,4 +1,4 @@
-package com.tinywebgears.gmailoauth.util;
+package by.bsuir.gmailoauth.util;
 
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.GoogleApi;
