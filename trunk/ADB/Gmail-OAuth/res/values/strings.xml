@@ -21,4 +21,6 @@
     <string name="email">E-mail</string>
     <string name="keep">Keep it empty to send standart text.</string>
     <string name="send">Send</string>
+    <string name="subject">Subject</string>
+    <string name="body">Body</string>
 </resources>

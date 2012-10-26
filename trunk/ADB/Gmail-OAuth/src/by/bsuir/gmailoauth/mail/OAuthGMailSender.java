@@ -60,7 +60,7 @@ public class OAuthGMailSender
         {
             writer.write(header.toString());
             writer.write(body);
-            writer.write("\n.\n");
+            //writer.write("\n.\n");
             writer.close();
             client.completePendingCommand();
         }
