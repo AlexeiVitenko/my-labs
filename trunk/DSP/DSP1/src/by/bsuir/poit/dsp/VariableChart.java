@@ -21,7 +21,7 @@ public class VariableChart extends Polyharmonic {
 	protected XYDataItem getData(int index) {
 		float result = 0;
 		for (int j = 0; j < phi.length; j++) {
-			float k = (1 + 0.2f * index / mPeriod[index]);
+			float k = (1 + 0.2f * index / mPeriod[j]);
 			result += k * A * Math.sin(2 * Math.PI * f[j] * k * index / N + phi[j] * k);
 		}
 		return new XYDataItem(index, result);
