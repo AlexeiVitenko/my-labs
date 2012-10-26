@@ -11,11 +11,18 @@
         android:hint="@string/email"
         />
     <EditText 
+        android:id="@+id/ed_subject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:hint="@string/subject"
+        />
+    <EditText 
         android:id="@+id/ed_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="5"
-        android:hint="@string/keep"
+        android:hint="@string/body"
         android:gravity="top|left"/>
 
     <View

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +21,7 @@ public class MailsAdapter extends CursorAdapter{
     public MailsAdapter(Context context, DBHelper helper) {
         super(context, helper.getReadableDatabase().rawQuery("select * from " + DBHelper.ADDRES_TABLE, null));
         mHelper = helper;
+        Log.d("cursor size",""+ getCursor().getCount());
     }
 
     public void setOnItemClickListener(OnClickListener listener){
@@ -31,12 +33,13 @@ public class MailsAdapter extends CursorAdapter{
         ViewHolder vh = (ViewHolder) view.getTag();
         final String mail = cursor.getString(cursor.getColumnIndex(DBColumns.MAIL));
         final String text = cursor.getString(cursor.getColumnIndex(DBColumns.TEXT));
+        final Long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
         vh.text.setText(mail);
         vh.remove.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                remove(mail, text);
+                remove(id);
             }
         });
         MainActivity main = ((MainActivity)context);
@@ -44,11 +47,12 @@ public class MailsAdapter extends CursorAdapter{
         b.putLong("id", cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
         b.putString("mail", cursor.getString(cursor.getColumnIndex(DBColumns.MAIL)));
         b.putString("text", cursor.getString(cursor.getColumnIndex(DBColumns.TEXT)));
+        b.putString("subj", cursor.getString(cursor.getColumnIndex(DBColumns.SUBJECT)));
         view.setOnClickListener(main.new MyClickListener(b));
     }
 
-    private void remove(String mail, String text) {
-        mHelper.remove(mail, text);
+    private void remove(Long id) {
+        mHelper.remove(id);
         getCursor().requery();
     }
     

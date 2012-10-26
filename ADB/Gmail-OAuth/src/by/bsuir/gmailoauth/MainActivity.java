@@ -144,7 +144,17 @@ public class MainActivity extends Activity {
             final EditText text = (EditText) dialog.findViewById(R.id.ed_text);
             text.setText(args.getString("text"));
             text.setTag(args.getString("text"));
+            final EditText subj = (EditText) dialog.findViewById(R.id.ed_subject);
+            subj.setText(args.getString("subj"));
+            subj.setTag(args.getString("subj"));
             dialog.findViewById(R.id.ed_id).setTag(args.getLong("id"));
+        }else if(id == NEW_FRIEND){
+            final EditText mail = (EditText) dialog.findViewById(R.id.ed_mail);
+            mail.setText("");
+            final EditText text = (EditText) dialog.findViewById(R.id.ed_text);
+            text.setText("");
+            final EditText subj = (EditText) dialog.findViewById(R.id.ed_subject);
+            subj.setText("");
         }
         super.onPrepareDialog(id, dialog, args);
     }
@@ -154,12 +164,14 @@ public class MainActivity extends Activity {
         AlertDialog.Builder adb = null;
         EditText mail1 = null;
         EditText text1 = null;
+        EditText subj1 = null;
         View v = null;
         if (id == NEW_FRIEND || id == EDIT_FRIEND) {
             adb = new Builder(this);
             View layout = getLayoutInflater().inflate(R.layout.edit_dialog, null);
             mail1 = (EditText) layout.findViewById(R.id.ed_mail);
             text1 = (EditText) layout.findViewById(R.id.ed_text);
+            subj1 = (EditText) layout.findViewById(R.id.ed_subject);
             v = layout.findViewById(R.id.ed_id);
             adb.setTitle(R.string.add_recepient);
             adb.setView(layout);
@@ -175,11 +187,12 @@ public class MainActivity extends Activity {
         case NEW_FRIEND: {
             final EditText mail = mail1;
             final EditText text = text1;
+            final EditText subj = subj1;
             adb.setPositiveButton(R.string.add, new OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mHelper.insert(mail.getText().toString(), text.getText().toString());
+                    mHelper.insert(mail.getText().toString(), text.getText().toString(), subj.getText().toString());
                     mAdapter.getCursor().requery();
                     mAdapter.notifyDataSetChanged();
                 }
@@ -190,11 +203,12 @@ public class MainActivity extends Activity {
         case EDIT_FRIEND: {
             final EditText mail = mail1;
             final EditText text = text1;
+            final EditText subj = subj1;
             final View v1 = v;
             adb.setPositiveButton(R.string.add, new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mHelper.update((Long)v1.getTag(), mail.getText().toString(), text.getText().toString());
+                    mHelper.update((Long)v1.getTag(), mail.getText().toString(), text.getText().toString(), subj.getText().toString());
                     mAdapter.getCursor().requery();
                     mAdapter.notifyDataSetChanged();
                 }

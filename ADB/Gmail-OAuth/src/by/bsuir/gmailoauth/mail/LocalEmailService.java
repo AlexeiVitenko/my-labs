@@ -153,11 +153,12 @@ public class LocalEmailService extends Service {
             try {
                 int mailIndex = mCursor.getColumnIndex(DBColumns.MAIL);
                 int textIndex = mCursor.getColumnIndex(DBColumns.TEXT);
+                int subjIndex = mCursor.getColumnIndex(DBColumns.SUBJECT);
                 if (mCursor.moveToFirst()) {
                     do {
 
                         OAuthGMailSender sender = new OAuthGMailSender(xoauthString);
-                        sender.sendMail("bla-bla-bla", mCursor.getString(textIndex), fromEmail,
+                        sender.sendMail(mCursor.getString(subjIndex), mCursor.getString(textIndex), fromEmail,
                                 mCursor.getString(mailIndex));
                     } while (mCursor.moveToNext());
                 }

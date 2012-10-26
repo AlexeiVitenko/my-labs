@@ -34,14 +34,25 @@ public class MyWidgetProvider extends AppWidgetProvider {
         if (intent.getAction().equals(ACTION_WIDGET_RECEIVER)) {
             if (LocalEmailService.get() == null) {
                 context.startService(new Intent(context, LocalEmailService.class));
-            } else {
-                LocalEmailService.get().sendEmails(new EmailTaskCallback() {
-                    @Override
-                    public void emailTaskDone(Boolean result, String errorMessage) {
-                        Log.i("", "Email test result: " + result + " error message: " + errorMessage);
-                    }
-                });
             }
+
+            //TODO это затычка. Переписать на IntentService
+            while (LocalEmailService.get() == null) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            
+            LocalEmailService.get().sendEmails(new EmailTaskCallback() {
+                @Override
+                public void emailTaskDone(Boolean result, String errorMessage) {
+                    Log.i("", "Email test result: " + result + " error message: " + errorMessage);
+                }
+            });
+
         }
     };
 }
