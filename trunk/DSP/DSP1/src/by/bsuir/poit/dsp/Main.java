@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class Main {
 
     private static final String HARMONIC = "h 8 2 1 6 4";
-    private static final String POLUHARMONIC = "p 3 2 1 1 4 3 4 2 3 1 2 1 3";
+    private static final String POLIHARMONIC = "p 3 2 1 1 4 3 4 2 3 1 2 1 3";
     private static final Pattern HARMONIC_COMMAND = Pattern.compile("[hH].*");
     
     private static final Pattern HARMONIC_PATTERN = Pattern
