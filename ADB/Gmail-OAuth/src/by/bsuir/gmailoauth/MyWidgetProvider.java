@@ -1,22 +1,24 @@
 package by.bsuir.gmailoauth;
 
 import by.bsuir.gmailoauth.mail.LocalEmailService;
-import by.bsuir.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.view.View;
 import android.widget.RemoteViews;
 
 public class MyWidgetProvider extends AppWidgetProvider {
 
     public static String ACTION_WIDGET_RECEIVER = "ACTION_WIDGET_RECEIVER";
+    private int[] mWidgetIds;
+    private RemoteViews mRemoteViews;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // super.onUpdate(context, appWidgetManager, appWidgetIds);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
 
         Intent active = new Intent(context, MyWidgetProvider.class);
@@ -24,35 +26,36 @@ public class MyWidgetProvider extends AppWidgetProvider {
         active.putExtra("sad", "sdf");
         PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
 
-        remoteViews.setOnClickPendingIntent(R.id.widget_button, actionPendingIntent);
-
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo [] ni = cm.getAllNetworkInfo();
+        if (ni != null) {
+            boolean flag = false;;
+            for (NetworkInfo networkInfo : ni) {
+                if (networkInfo.isConnected()) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                remoteViews.setViewVisibility(R.id.widget_button, View.VISIBLE);
+                remoteViews.setViewVisibility(R.id.widget_button_disabled, View.INVISIBLE);
+                remoteViews.setOnClickPendingIntent(R.id.widget_button, actionPendingIntent);
+            } else {
+                remoteViews.setViewVisibility(R.id.widget_button, View.INVISIBLE);
+                remoteViews.setViewVisibility(R.id.widget_button_disabled, View.VISIBLE);
+            }
+        }
+        mWidgetIds = appWidgetIds;
+        mRemoteViews = remoteViews;
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }
 
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         if (intent.getAction().equals(ACTION_WIDGET_RECEIVER)) {
-            if (LocalEmailService.get() == null) {
-                context.startService(new Intent(context, LocalEmailService.class));
-            }
-
-            //TODO это затычка. Переписать на IntentService
-            while (LocalEmailService.get() == null) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            
-            LocalEmailService.get().sendEmails(new EmailTaskCallback() {
-                @Override
-                public void emailTaskDone(Boolean result, String errorMessage) {
-                    Log.i("", "Email test result: " + result + " error message: " + errorMessage);
-                }
-            });
-
+            context.startService(new Intent(LocalEmailService.ACTION_SEND_ALL));
+        } else if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+            AppWidgetManager.getInstance(context).updateAppWidget(mWidgetIds, mRemoteViews);
         }
     };
 }
