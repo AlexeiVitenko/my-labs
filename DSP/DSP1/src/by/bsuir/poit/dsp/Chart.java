@@ -45,7 +45,7 @@ public abstract class Chart {
     protected abstract XYDataItem getData(int index);
 
     public void makeChart() {
-        XYSeries xys = new XYSeries("key");
+        XYSeries xys = new XYSeries("Pair");
         for (int i = 0; i < N; i++) {
             xys.add(getData(i));
         }
