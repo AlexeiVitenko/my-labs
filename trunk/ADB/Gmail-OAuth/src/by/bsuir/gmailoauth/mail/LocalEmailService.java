@@ -12,15 +12,26 @@ import org.scribe.model.OAuthRequest;
 import org.scribe.model.Verb;
 import org.scribe.utils.OAuthEncoder;
 
+import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.RemoteViews;
+import android.widget.Toast;
 
+import by.bsuir.gmailoauth.MainActivity;
 import by.bsuir.gmailoauth.R;
 import by.bsuir.gmailoauth.UserData;
 import by.bsuir.gmailoauth.data.DBHelper;
@@ -29,51 +40,22 @@ import by.bsuir.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 import by.bsuir.gmailoauth.util.OAuthBuilder;
 import by.bsuir.gmailoauth.util.OAuthHelper;
 
-public class LocalEmailService extends Service {
-    private static final String TAG = "LocalEmailService";
+public class LocalEmailService extends IntentService {
+    private static final int NOTIFICATION_ID = 1927;
+    public static String ACTION_SEND_ALL = "by.bsuir.gmailoauth.mail.ACTION_SEND_ALL";
+    private final Handler mHandler;
 
-    private static LocalEmailService instance;
-
-    public static LocalEmailService get() {
-        return instance;
+    public LocalEmailService() {
+        super(TAG);
+        mHandler = new Handler();
     }
+
+    private static final String TAG = "LocalEmailService";
 
     private SharedPreferences prefs;
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        instance = this;
-        prefs = UserData.getPrefs(this);
-        Log.d(TAG, "LocalEmailService: onCreate");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "LocalEmailService: onDestroy");
-    }
-
     public boolean isSetUp() {
         return prefs.getString(UserData.PREF_KEY_TARGET_EMAIL_ADDRESS, null) != null;
-    }
-
-    public void sendEmail(String subject, String text, EmailTaskCallback callback) {
-        if (!UserData.isOAuthSetUp()) {
-            Log.e(TAG, "Please configure email send method.");
-            return;
-        }
-        String xoauthString = buildXOAuth();
-        Log.d(TAG, "XOAuth: " + xoauthString);
-        String fromEmail = prefs.getString(UserData.PREF_KEY_OAUTH_EMAIL_ADDRESS, null);
-        EmailSendTask emailSendTask = new EmailSendTask(fromEmail, xoauthString, callback);
-        String targetEmailAddress = prefs.getString(UserData.PREF_KEY_TARGET_EMAIL_ADDRESS, null);
-        emailSendTask.execute(targetEmailAddress, subject, text);
     }
 
     public interface EmailTaskCallback {
@@ -94,86 +76,90 @@ public class LocalEmailService extends Service {
         }
     }
 
-    private class EmailSendTask extends AsyncTask<String, Void, EmailTaskResponseType> {
-        private final String fromEmail;
-        private final String xoauthString;
-        private final EmailTaskCallback callback;
-
-        public EmailSendTask(String fromEmail, String xoauthString, EmailTaskCallback callback) {
-            this.fromEmail = fromEmail;
-            this.xoauthString = xoauthString;
-            this.callback = callback;
-        }
-
-        @Override
-        protected EmailTaskResponseType doInBackground(String... params) {
-            Log.i(TAG, "Sending email: " + params);
-            if (params.length < 3) {
-                Log.wtf(TAG, "Insufficient parameters: " + params);
-                return EmailTaskResponseType.create(false,
-                        getString(R.string.error_internal, "Insufficient parameters to email task."));
-            }
-            String email = params[0];
-            String subject = params[1];
-            String text = params[2];
-
-            try {
-                OAuthGMailSender sender = new OAuthGMailSender(xoauthString);
-                sender.sendMail(subject, text, fromEmail, email);
-                return EmailTaskResponseType.create(true, null);
-            } catch (Exception e) {
-                Log.e(TAG, "An error occurred while sending email: " + e, e);
-                return EmailTaskResponseType.create(false, "Error sending email: " + e.getMessage());
-            }
-        }
-
-        @Override
-        protected void onPostExecute(EmailTaskResponseType result) {
-            Log.i(TAG, "Email sent, result: " + result);
-            callback.emailTaskDone(result.first, result.second);
-        }
-    }
-
-    private class EmailsSendTask extends AsyncTask<String, Void, EmailTaskResponseType> {
+    private class EmailsSendTask {
         private final String fromEmail;
         private final String xoauthString;
         private final EmailTaskCallback callback;
         private final Cursor mCursor;
+        private final NotificationManager mNotifyManager;
+        private Notification noti;
 
         public EmailsSendTask(Cursor c, String from, String xoauthString, EmailTaskCallback callback) {
             mCursor = c;
             this.fromEmail = from;
             this.xoauthString = xoauthString;
             this.callback = callback;
+            mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
 
-        @Override
-        protected EmailTaskResponseType doInBackground(String... params) {
+        private String getProgress(Resources rec, int curr, int max) {
+            return String.format(rec.getString(R.string.notification_message), curr, max);
+        }
 
+        private RemoteViews onPreExecute() {
+            long when = System.currentTimeMillis();
+            noti = new Notification(R.drawable.ic_launcher, getString(R.string.notification_emails), when);
+            Context context = LocalEmailService.this.getApplicationContext();
+            Intent notiIntent = new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            PendingIntent pi = PendingIntent.getActivity(context, 0, notiIntent, 0);
+            noti.flags |= Notification.FLAG_AUTO_CANCEL;
+            CharSequence title = "Downloading initializing...";
+            final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
+            contentView.setTextViewText(R.id.n_message, getProgress(getResources(), 0, mCursor.getCount()));
+            contentView.setProgressBar(R.id.n_progress, mCursor.getCount(), 0, false);
+            noti.contentView = contentView;
+            noti.contentIntent = pi;
+            mNotifyManager.notify(NOTIFICATION_ID, noti);
+            return contentView;
+        }
+
+        public void execute() {
+
+            if (mCursor.getCount() > 0) {
+                doTask(onPreExecute());
+            }
+        }
+
+        protected void doTask(final RemoteViews contentView) {
+            EmailTaskResponseType result;
             try {
                 int mailIndex = mCursor.getColumnIndex(DBColumns.MAIL);
                 int textIndex = mCursor.getColumnIndex(DBColumns.TEXT);
                 int subjIndex = mCursor.getColumnIndex(DBColumns.SUBJECT);
                 if (mCursor.moveToFirst()) {
                     do {
-
                         OAuthGMailSender sender = new OAuthGMailSender(xoauthString);
                         sender.sendMail(mCursor.getString(subjIndex), mCursor.getString(textIndex), fromEmail,
                                 mCursor.getString(mailIndex));
+                        contentView.setTextViewText(R.id.n_message,
+                                getProgress(getResources(), mCursor.getPosition() + 1, mCursor.getCount()));
+                        contentView.setProgressBar(R.id.n_progress, mCursor.getCount(), mCursor.getPosition() + 1,
+                                false);
+                        mNotifyManager.notify(NOTIFICATION_ID, noti);
                     } while (mCursor.moveToNext());
                 }
-                return EmailTaskResponseType.create(true, null);
+                result = EmailTaskResponseType.create(true, null);
+                showToast(String.format(getString(R.string.success), mCursor.getCount()));
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred while sending email: " + e, e);
-                return EmailTaskResponseType.create(false, "Error sending email: " + e.getMessage());
+                showToast(getString(R.string.error));
+                result = EmailTaskResponseType.create(false, "Error sending email: " + e.getMessage());
             }
-        }
+            mNotifyManager.cancel(NOTIFICATION_ID);
 
-        @Override
-        protected void onPostExecute(EmailTaskResponseType result) {
             Log.i(TAG, "Email sent, result: " + result);
             callback.emailTaskDone(result.first, result.second);
         }
+    }
+
+    private void showToast(final String text) {
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private String buildXOAuth() {
@@ -223,7 +209,26 @@ public class LocalEmailService extends Service {
         String xoauthString = buildXOAuth();
         Log.d(TAG, "XOAuth: " + xoauthString);
         String fromEmail = prefs.getString(UserData.PREF_KEY_OAUTH_EMAIL_ADDRESS, null);
-        EmailsSendTask emailSendTask = new EmailsSendTask(DBHelper.getInstance(getApplicationContext()).getAll(),fromEmail, xoauthString, emailTaskCallback);
+        EmailsSendTask emailSendTask = new EmailsSendTask(DBHelper.getInstance(getApplicationContext()).getAll(),
+                fromEmail, xoauthString, emailTaskCallback);
         emailSendTask.execute();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        prefs = UserData.getPrefs(this);
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        if (intent.getAction().equals(ACTION_SEND_ALL)) {
+            sendEmails(new EmailTaskCallback() {
+                @Override
+                public void emailTaskDone(Boolean result, String errorMessage) {
+                    Log.i(TAG, "Email test result: " + result + " error message: " + errorMessage);
+                }
+            });
+        }
     }
 }

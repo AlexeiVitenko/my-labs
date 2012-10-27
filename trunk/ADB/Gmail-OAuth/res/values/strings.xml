@@ -23,4 +23,8 @@
     <string name="send">Send</string>
     <string name="subject">Subject</string>
     <string name="body">Body</string>
+    <string name="notification_message">"Sending emails: %1$d of %2$d"</string>
+    <string name="notification_emails">Sending emails</string>
+    <string name="success">Successfully sent %d e-mails.</string>
+    <string name="error">Error ocurs during e-mails sending.</string>
 </resources>

@@ -7,6 +7,7 @@
     <uses-sdk android:minSdkVersion="8" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -45,6 +46,9 @@
         <service
             android:name=".mail.LocalEmailService"
             android:enabled="true" >
+            <intent-filter>
+                <action android:name="by.bsuir.gmailoauth.mail.ACTION_SEND_ALL" />
+            </intent-filter>
         </service>
 
         <receiver
@@ -53,6 +57,9 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="ACTION_WIDGET_RECEIVER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
 
             <meta-data

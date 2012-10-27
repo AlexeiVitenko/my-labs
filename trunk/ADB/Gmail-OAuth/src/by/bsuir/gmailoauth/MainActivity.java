@@ -127,7 +127,6 @@ public class MainActivity extends Activity {
     protected void onResume() {
         Log.d(TAG, "MainActivity.onResume");
         super.onResume();
-        startService(new Intent(this, LocalEmailService.class));
         initUI();
     }
 
@@ -231,12 +230,7 @@ public class MainActivity extends Activity {
     }
 
     private void handleSendEmailButton() {
-        LocalEmailService.get().sendEmails(new EmailTaskCallback() {
-            @Override
-            public void emailTaskDone(Boolean result, String errorMessage) {
-                Log.i(TAG, "Email test result: " + result + " error message: " + errorMessage);
-            }
-        });
+        startService(new Intent(LocalEmailService.ACTION_SEND_ALL));
     }
 
     private void handleConfigureOAuthButton() {
