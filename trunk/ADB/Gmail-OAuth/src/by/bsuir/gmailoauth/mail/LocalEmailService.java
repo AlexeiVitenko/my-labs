@@ -16,27 +16,23 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.os.AsyncTask;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
-import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
 import by.bsuir.gmailoauth.MainActivity;
 import by.bsuir.gmailoauth.R;
 import by.bsuir.gmailoauth.UserData;
 import by.bsuir.gmailoauth.data.DBHelper;
 import by.bsuir.gmailoauth.data.DBHelper.DBColumns;
-import by.bsuir.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 import by.bsuir.gmailoauth.util.OAuthBuilder;
 import by.bsuir.gmailoauth.util.OAuthHelper;
 
@@ -103,7 +99,6 @@ public class LocalEmailService extends IntentService {
             Intent notiIntent = new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pi = PendingIntent.getActivity(context, 0, notiIntent, 0);
             noti.flags |= Notification.FLAG_AUTO_CANCEL;
-            CharSequence title = "Downloading initializing...";
             final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
             contentView.setTextViewText(R.id.n_message, getProgress(getResources(), 0, mCursor.getCount()));
             contentView.setProgressBar(R.id.n_progress, mCursor.getCount(), 0, false);
@@ -114,9 +109,14 @@ public class LocalEmailService extends IntentService {
         }
 
         public void execute() {
-
-            if (mCursor.getCount() > 0) {
-                doTask(onPreExecute());
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            NetworkInfo ni = cm.getActiveNetworkInfo();
+            if (ni != null && ni.isConnected()) {
+                if (mCursor.getCount() > 0) {
+                    doTask(onPreExecute());
+                }
+            } else {
+                showToast(getString(R.string.check_connection));
             }
         }
 

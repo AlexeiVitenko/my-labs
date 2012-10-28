@@ -6,13 +6,14 @@
     <ImageView
         android:id="@+id/n_icon"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
-        android:src="@drawable/ic_launcher"/>
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:src="@drawable/ic_launcher" />
 
     <LinearLayout
-        android:layout_toRightOf="@id/n_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_toRightOf="@id/n_icon"
         android:orientation="vertical"
         android:padding="5dp" >
 
@@ -20,15 +21,15 @@
             android:id="@+id/n_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:text="@string/notification_message" />
+            android:paddingBottom="5dp"
+            android:text="@string/notification_message"
+            android:textSize="18sp" />
 
         <ProgressBar
             android:id="@+id/n_progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@android:style/Widget.ProgressBar.Horizontal" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </RelativeLayout>

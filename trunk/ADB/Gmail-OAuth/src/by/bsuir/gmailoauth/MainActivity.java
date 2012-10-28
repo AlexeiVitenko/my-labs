@@ -4,33 +4,30 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.provider.BaseColumns;
-import android.util.Log;
+
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import by.bsuir.gmailoauth.R;
 import by.bsuir.gmailoauth.data.DBHelper;
-import by.bsuir.gmailoauth.data.DBHelper.DBColumns;
 import by.bsuir.gmailoauth.mail.LocalEmailService;
-import by.bsuir.gmailoauth.mail.LocalEmailService.EmailTaskCallback;
 
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
     private static final int NEW_FRIEND = 1400;
     private static final int EDIT_FRIEND = 1401;
-    private static MainActivity instance;
     private SharedPreferences prefs;
     private TextView oauthResult;
     private EditText oauthEmail;
@@ -38,16 +35,20 @@ public class MainActivity extends Activity {
     private DBHelper mHelper;
     private ListView mRec;
     private MailsAdapter mAdapter;
+    private Button configureOAuth;
+    private BroadcastReceiver mInternetStateReceiver = new BroadcastReceiver() {
 
-    public static MainActivity get() {
-        return instance;
-    }
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                checkInternetState();
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "MainActivity.onCreate");
         super.onCreate(savedInstanceState);
-        instance = this;
         prefs = UserData.getPrefs(this);
         setContentView(R.layout.main);
         oauthEmail = (EditText) findViewById(R.id.oauthemailtextbox);
@@ -63,7 +64,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        final Button configureOAuth = (Button) this.findViewById(R.id.configoauthbutton);
+        configureOAuth = (Button) this.findViewById(R.id.configoauthbutton);
         configureOAuth.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 handleConfigureOAuthButton();
@@ -78,9 +79,21 @@ public class MainActivity extends Activity {
         });
     }
 
-    class MyClickListener implements View.OnClickListener{
+    private void checkInternetState() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni != null && ni.isConnected()) {
+            sendEmail.setEnabled(true);
+            configureOAuth.setEnabled(true);
+        } else {
+            sendEmail.setEnabled(false);
+            configureOAuth.setEnabled(false);
+        }
+    }
+
+    class MyClickListener implements View.OnClickListener {
         private Bundle b;
-        
+
         public MyClickListener(Bundle b) {
             super();
             this.b = b;
@@ -91,21 +104,19 @@ public class MainActivity extends Activity {
             showDialog(EDIT_FRIEND, b);
         }
     }
-    
+
     @Override
     protected void onStart() {
-        Log.d(TAG, "MainActivity.onStart");
         super.onStart();
+        registerReceiver(mInternetStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.d(TAG, "MainActivity.onNewIntent");
         super.onNewIntent(intent);
     }
 
     private void initUI() {
-        Log.d(TAG, "MainActivity.initUI");
         if (UserData.isOAuthSetUp()) {
             oauthResult.setText(R.string.oauth_set_up);
             oauthEmail.setText(prefs.getString(UserData.PREF_KEY_OAUTH_EMAIL_ADDRESS, null));
@@ -119,13 +130,12 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "MainActivity.onStop");
+        unregisterReceiver(mInternetStateReceiver);
         super.onStop();
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "MainActivity.onResume");
         super.onResume();
         initUI();
     }
@@ -133,7 +143,7 @@ public class MainActivity extends Activity {
     public void addRec(View v) {
         showDialog(NEW_FRIEND);
     }
-    
+
     @Override
     protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
         if (id == EDIT_FRIEND) {
@@ -147,7 +157,7 @@ public class MainActivity extends Activity {
             subj.setText(args.getString("subj"));
             subj.setTag(args.getString("subj"));
             dialog.findViewById(R.id.ed_id).setTag(args.getLong("id"));
-        }else if(id == NEW_FRIEND){
+        } else if (id == NEW_FRIEND) {
             final EditText mail = (EditText) dialog.findViewById(R.id.ed_mail);
             mail.setText("");
             final EditText text = (EditText) dialog.findViewById(R.id.ed_text);
@@ -207,7 +217,8 @@ public class MainActivity extends Activity {
             adb.setPositiveButton(R.string.add, new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mHelper.update((Long)v1.getTag(), mail.getText().toString(), text.getText().toString(), subj.getText().toString());
+                    mHelper.update((Long) v1.getTag(), mail.getText().toString(), text.getText().toString(), subj
+                            .getText().toString());
                     mAdapter.getCursor().requery();
                     mAdapter.notifyDataSetChanged();
                 }
@@ -226,7 +237,6 @@ public class MainActivity extends Activity {
         edit.remove(UserData.PREF_KEY_OAUTH_ACCESS_TOKEN_SECRET);
         edit.remove(UserData.PREF_KEY_OAUTH_EMAIL_ADDRESS);
         edit.commit();
-        Log.i(TAG, "OAuth cleared.");
     }
 
     private void handleSendEmailButton() {
@@ -234,8 +244,6 @@ public class MainActivity extends Activity {
     }
 
     private void handleConfigureOAuthButton() {
-        Log.i(TAG, "Configuring OAuth...");
-
         startActivity(new Intent().setClass(getApplicationContext(), OAuthActivity.class));
     }
 

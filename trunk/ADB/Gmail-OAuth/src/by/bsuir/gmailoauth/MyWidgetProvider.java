@@ -4,6 +4,7 @@ import by.bsuir.gmailoauth.mail.LocalEmailService;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -14,8 +15,6 @@ import android.widget.RemoteViews;
 public class MyWidgetProvider extends AppWidgetProvider {
 
     public static String ACTION_WIDGET_RECEIVER = "ACTION_WIDGET_RECEIVER";
-    private int[] mWidgetIds;
-    private RemoteViews mRemoteViews;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -27,9 +26,10 @@ public class MyWidgetProvider extends AppWidgetProvider {
         PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo [] ni = cm.getAllNetworkInfo();
+        NetworkInfo[] ni = cm.getAllNetworkInfo();
         if (ni != null) {
-            boolean flag = false;;
+            boolean flag = false;
+            ;
             for (NetworkInfo networkInfo : ni) {
                 if (networkInfo.isConnected()) {
                     flag = true;
@@ -45,8 +45,6 @@ public class MyWidgetProvider extends AppWidgetProvider {
                 remoteViews.setViewVisibility(R.id.widget_button_disabled, View.VISIBLE);
             }
         }
-        mWidgetIds = appWidgetIds;
-        mRemoteViews = remoteViews;
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }
 
@@ -55,7 +53,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
         if (intent.getAction().equals(ACTION_WIDGET_RECEIVER)) {
             context.startService(new Intent(LocalEmailService.ACTION_SEND_ALL));
         } else if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-            AppWidgetManager.getInstance(context).updateAppWidget(mWidgetIds, mRemoteViews);
+            onUpdate(context, AppWidgetManager.getInstance(context), AppWidgetManager.getInstance(context)
+                    .getAppWidgetIds(new ComponentName(context.getPackageName(), MyWidgetProvider.class.getName())));
         }
     };
 }

@@ -4,7 +4,9 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="8" />
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="8" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -57,9 +59,8 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="ACTION_WIDGET_RECEIVER" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.ConnectivityManager.CONNECTIVITY_ACTION" />
             </intent-filter>
 
             <meta-data

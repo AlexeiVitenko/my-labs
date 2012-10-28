@@ -27,4 +27,5 @@
     <string name="notification_emails">Sending emails</string>
     <string name="success">Successfully sent %d e-mails.</string>
     <string name="error">Error ocurs during e-mails sending.</string>
+    <string name="check_connection">Check network connection!</string>
 </resources>
