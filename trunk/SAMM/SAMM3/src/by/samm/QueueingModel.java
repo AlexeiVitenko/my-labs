@@ -12,6 +12,8 @@ public class QueueingModel {
     private final Buffer mBuffer;
     // TODO to Int, Int -> SparseArray or bitmask;
     private final Map<String, Integer> mResults;
+    private int mPotk;
+    private int mKzan;
 
     public QueueingModel() {
         mRandom = new LemerRandom(22695477, 1, 2L << 32, 50000);
@@ -23,7 +25,14 @@ public class QueueingModel {
         mResults = new TreeMap<String, Integer>();
     }
 
-    public void nextMove() {
+    public void start(int turns) {
+        for (int i = 0; i < turns; i++) {
+            nextMove();
+        }
+        showResults(turns);
+    }
+
+    private void nextMove() {
         mFirstChannel.nextTurn();
         mSecondChannel.nextTurn();
         Request bufRequest = mBuffer.nextTurn();
@@ -40,7 +49,9 @@ public class QueueingModel {
         } else if (mSecondChannel.putRequest(srcRequest)) {
 
         } else if (mBuffer.putRequest(srcRequest)) {
-
+            mKzan++;
+        } else if (srcRequest != null) {
+            mPotk++;
         }
         String str = toString();
         if (mResults.containsKey(str)) {
@@ -51,10 +62,12 @@ public class QueueingModel {
         // System.out.println(str);
     }
 
-    public void showResults() {
+    private void showResults(int turns) {
         for (String str : mResults.keySet()) {
-            System.out.println("str == " + str + ": " + ((float) mResults.get(str)) / 10000);
+            System.out.println("State == " + str + ": " + ((float) mResults.get(str)) / turns);
         }
+        System.out.println("Potk == "+(((float)mPotk)/turns));
+        System.out.println("Kzan == "+(((float)mKzan)/turns));
     }
 
     @Override
