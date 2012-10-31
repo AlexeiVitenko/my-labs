@@ -2,6 +2,7 @@ package by.samm;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -49,10 +50,17 @@ public class LemerRandom {
             sb.append(res + "\n");
         } while (result.size() < goal);
         listOfResults = new ArrayList<Float>(result);
+        Collections.shuffle(listOfResults);
         return true;
     }
 
     public float nextFloat() {
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return listOfResults.get((int) (System.currentTimeMillis() % listOfResults.size()));
     }
 

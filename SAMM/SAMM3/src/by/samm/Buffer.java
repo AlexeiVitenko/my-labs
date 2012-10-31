@@ -2,9 +2,11 @@ package by.samm;
 
 public class Buffer extends Element {
     
-    public void clear(boolean flag){
-        if (flag) {
-            mRequest = null;
-        }
+    
+    @Override
+    public Request nextTurn() {
+        Request r = mRequest;
+        mRequest = null;
+        return r;
     }
 }
