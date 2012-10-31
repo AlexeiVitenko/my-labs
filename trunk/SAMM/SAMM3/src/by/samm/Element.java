@@ -1,6 +1,6 @@
 package by.samm;
 
-public class Element {
+public abstract class Element {
     protected Request mRequest;
 
     public boolean putRequest(Request request) {
@@ -11,9 +11,7 @@ public class Element {
         return true;
     }
 
-    public Request nextTurn() {
-        return mRequest;
-    }
+    public abstract Request nextTurn();
 
     public boolean getState() {
         return mRequest != null;

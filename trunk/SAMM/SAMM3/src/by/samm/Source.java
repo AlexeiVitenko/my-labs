@@ -6,5 +6,9 @@ public class Source extends ElementWithRandom {
         super(random, ro);
     }
     
-    
+    @Override
+    public Request nextTurn() {
+        mRequest = new Request();
+        return super.nextTurn();
+    }
 }
