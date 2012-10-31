@@ -123,23 +123,25 @@ public class LocalEmailService extends IntentService {
         protected void doTask(final RemoteViews contentView) {
             EmailTaskResponseType result;
             try {
+                int sent = 0;
                 int mailIndex = mCursor.getColumnIndex(DBColumns.MAIL);
                 int textIndex = mCursor.getColumnIndex(DBColumns.TEXT);
                 int subjIndex = mCursor.getColumnIndex(DBColumns.SUBJECT);
                 if (mCursor.moveToFirst()) {
                     do {
                         OAuthGMailSender sender = new OAuthGMailSender(xoauthString);
-                        sender.sendMail(mCursor.getString(subjIndex), mCursor.getString(textIndex), fromEmail,
-                                mCursor.getString(mailIndex));
                         contentView.setTextViewText(R.id.n_message,
                                 getProgress(getResources(), mCursor.getPosition() + 1, mCursor.getCount()));
                         contentView.setProgressBar(R.id.n_progress, mCursor.getCount(), mCursor.getPosition() + 1,
                                 false);
                         mNotifyManager.notify(NOTIFICATION_ID, noti);
+                        if (sender.sendMail(mCursor.getString(subjIndex), mCursor.getString(textIndex), fromEmail,
+                                mCursor.getString(mailIndex)))
+                            sent++;
                     } while (mCursor.moveToNext());
                 }
                 result = EmailTaskResponseType.create(true, null);
-                showToast(String.format(getString(R.string.success), mCursor.getCount()));
+                showToast(String.format(getString(R.string.success), sent));
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred while sending email: " + e, e);
                 showToast(getString(R.string.error));

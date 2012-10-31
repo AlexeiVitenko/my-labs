@@ -33,7 +33,7 @@ public class OAuthGMailSender
 
     }
 
-    public synchronized void sendMail(String subject, String body, String sender, String recipient) throws Exception
+    public synchronized boolean sendMail(String subject, String body, String sender, String recipient) throws Exception
     {
         Log.d(TAG, "Sending email...");
         SimpleSMTPHeader header = new SimpleSMTPHeader(sender, recipient, subject);
@@ -53,21 +53,23 @@ public class OAuthGMailSender
         }
 
         client.setSender(sender);
-        client.addRecipient(recipient);
-
-        Writer writer = client.sendMessageData();
-        if (writer != null)
-        {
-            writer.write(header.toString());
-            writer.write(body);
-            //writer.write("\n.\n");
-            writer.close();
-            client.completePendingCommand();
+        boolean canIFindRecepient = client.addRecipient(recipient);
+        
+        if (canIFindRecepient) {
+            Writer writer = client.sendMessageData();
+            if (writer != null) {
+                writer.write(header.toString());
+                writer.write(body);
+                // writer.write("\n.\n");
+                writer.close();
+                client.completePendingCommand();
+            }
         }
-
+        
         client.logout();
 
         client.disconnect();
+        return canIFindRecepient;
     }
 
     @SuppressWarnings("serial")
