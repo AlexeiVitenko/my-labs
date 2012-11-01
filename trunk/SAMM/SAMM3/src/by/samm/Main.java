@@ -7,7 +7,12 @@ public class Main {
      */
     public static void main(String[] args) {
         QueueingModel qm = new QueueingModel();
-        qm.start(10000);
+        if (args.length>0) {
+            qm.start(Integer.parseInt(args[0]));
+        } else {
+
+            qm.start(50000);
+        }
     }
 
 }
