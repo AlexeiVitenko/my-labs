@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">GMail OAuth</string>
+    <string name="app_name">GMail Quick Sender</string>
     <string name="send_email">Send Email</string>
     <string name="configure_oauth">Configure</string>
     <string name="clear_oauth">Clear</string>

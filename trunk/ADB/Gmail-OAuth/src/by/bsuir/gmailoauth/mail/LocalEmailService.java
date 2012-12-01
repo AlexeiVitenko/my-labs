@@ -98,7 +98,7 @@ public class LocalEmailService extends IntentService {
             Context context = LocalEmailService.this.getApplicationContext();
             Intent notiIntent = new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pi = PendingIntent.getActivity(context, 0, notiIntent, 0);
-            noti.flags |= Notification.FLAG_AUTO_CANCEL;
+            noti.flags |= Notification.FLAG_AUTO_CANCEL| Notification.FLAG_ONGOING_EVENT;
             final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
             contentView.setTextViewText(R.id.n_message, getProgress(getResources(), 0, mCursor.getCount()));
             contentView.setProgressBar(R.id.n_progress, mCursor.getCount(), 0, false);
