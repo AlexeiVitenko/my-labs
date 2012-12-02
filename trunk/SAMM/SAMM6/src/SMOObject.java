@@ -1,29 +1,36 @@
 import java.util.Random;
 
 
-public class SMOObject {
-    private float mNextEventDelta;
+public abstract class SMOObject implements Comparable<SMOObject>{
+    private float mNextEventTime;
     private Random mRandom = new Random();
     private float mLambda;
+    protected Worker mNextChannnel;
+    protected int mRequestsCount;
+    protected String mName;
     
-    public SMOObject(float lambda) {
+    public SMOObject(float lambda, Worker nextChannel, String name) {
         mLambda = lambda;
+        mNextChannnel = nextChannel;
+        getTimeInterval();
+        mName = name;
     }
     
-    public float getNextEventDelta() {
-        return mNextEventDelta;
+    public float getNextEventTime() {
+        return mNextEventTime;
     }
     
-    public void setNextEventDelta(float nextEventDelta) {
-        mNextEventDelta = nextEventDelta;
+    public void doWork(){
+        getTimeInterval();
     }
     
-    public float someEventHappens(float delta){
-        mNextEventDelta -= delta;
-        return mNextEventDelta;
+    public abstract void dumpResults();
+    public abstract int getFailsCount(); 
+    public int getSentCount() {
+        return mRequestsCount;
     }
     
-    private float getTimeInterval(float divisor)
+    private void getTimeInterval()
     {
         float value;
         do
@@ -33,9 +40,19 @@ public class SMOObject {
         while (value == 0 || value == 1);
         do
         {
-            value = (float) Math.abs(-Math.log(value) / divisor);
+            value = (float) Math.abs(-Math.log(value) / mLambda);
         }
         while (value == 0);
-        return value;
+        mNextEventTime += value;
+      //  log("time: "+mNextEventTime);
+    }
+
+    @Override
+    public int compareTo(SMOObject o) {
+        return Double.compare(mNextEventTime, o.getNextEventTime());
+    }
+    
+    protected void log(String msg) {
+        System.out.println(mName+": "+msg);
     }
 }
