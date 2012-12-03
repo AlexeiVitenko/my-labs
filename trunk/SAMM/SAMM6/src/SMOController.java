@@ -3,14 +3,17 @@ import java.util.Collections;
 import java.util.List;
 
 public class SMOController {
-    private static int L1 = 5;
+    private static int L1 = 1;
     private static int L2 = 2;
     private static float MU = 5f;
     private static float LAMBDA = 4.5f;
     private Source mSource;
     private List<SMOObject> mObjects = new ArrayList<SMOObject>();
 
-    public SMOController() {
+    public SMOController(int l1) {
+        System.out.println("/*********************************************\\");
+        L1 = l1;
+        System.out.println("n1 = "+L1);
         Worker w2 = new Worker(MU, null, 2, "W2");
         Worker w1 = new Worker(MU, w2, L1, "W1");
         mSource = new Source(4.5f, w1, "S");
@@ -24,6 +27,7 @@ public class SMOController {
     private void mainCycle() {
         for (int i = 0; i < 10000000; i++) {
             Collections.sort(mObjects);
+           // System.out.println(mObjects.get(0).getNextEventTime());
             mObjects.get(0).doWork();
         }
         analyticValues();
@@ -35,6 +39,7 @@ public class SMOController {
         for (int i = 0; i <= L1 + 1; i++) {
             val += Math.pow(ro, i);
         }
+        System.out.println(val);
         float P0 = 1 / val;
         float lambda1 = MU * (1 - P0);
         float ro1 = lambda1/MU;
@@ -43,8 +48,8 @@ public class SMOController {
             val += Math.pow(ro1, i);
         }
         float P0_2 = 1/val;
-        float Potk1 = (float) (Math.pow(ro, L1 + 1) * P0);
-        float Potk2 = (float) (Math.pow(ro1, L2 + 1) * P0_2);
+        float Potk1 = (float) (Math.pow(ro, L1 + 2) * P0);
+        float Potk2 = (float) (Math.pow(ro1, L2 + 2) * P0_2);
         System.out.println("P0 = " + P0);
         System.out.println("ro = " + ro);
         System.out.println("P0_2 = " + P0_2);
@@ -58,7 +63,9 @@ public class SMOController {
             obj.dumpResults();
             fails += obj.getFailsCount();
         }
-        System.out.println(fails);
+   //     System.out.println(fails);
         System.out.println("Potk_found = "+((float)fails/mSource.getSentCount()));
+        System.out.println("\\*********************************************/");
+        System.out.println();
     }
 }
