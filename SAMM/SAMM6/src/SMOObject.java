@@ -21,7 +21,9 @@ public abstract class SMOObject implements Comparable<SMOObject>{
     }
     
     public void doWork(){
+       // log("time " + mNextEventTime);
         getTimeInterval();
+    //    
     }
     
     public abstract void dumpResults();
@@ -40,7 +42,7 @@ public abstract class SMOObject implements Comparable<SMOObject>{
         while (value == 0 || value == 1);
         do
         {
-            value = (float) Math.abs(-Math.log(value) / mLambda);
+            value = (float) (-Math.log(value) / mLambda);
         }
         while (value == 0);
         mNextEventTime += value;

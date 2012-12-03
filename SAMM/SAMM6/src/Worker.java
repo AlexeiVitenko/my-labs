@@ -24,10 +24,8 @@ public class Worker extends SMOObject {
         mRequestsCount++;
         if (mQueueLength < mQueueMaxLength) {
             mQueueLength++;
-        //    log(""+mQueueLength);
         } else {
             mFailCount++;
-            
         }
     }
 
